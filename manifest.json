@@ -1,0 +1,57 @@
+{
+  "include": [
+    "$(MODDABLE)/examples/manifest_base.json",
+    "$(MODDABLE)/examples/manifest_net.json",
+    "$(MODDABLE)/examples/manifest_piu.json",
+    "$(MODDABLE)/modules/network/mdns/manifest.json",
+		"$(MODDABLE)/examples/manifest_commodetto.json",
+		"$(MODDABLE)/modules/crypt/tls.json"
+  ],
+  "creation": {
+    "static": 65536,
+    "stack": 512
+  },
+  "modules": {
+    "*": [
+      "./main",
+      "$(MODULES)/network/http/*",
+      "$(MODULES)/data/base64/*",
+      "$(MODULES)/data/logical/*",
+      "$(MODULES)/crypt/digest/*",
+      "$(MODULES)/crypt/digest/kcl/*"
+    ]
+		,
+		"commodetto/readJPEG": "$(MODDABLE)/modules/commodetto/commodettoReadJPEG",
+		"commodetto/BufferOut": "$(MODDABLE)/modules/commodetto/commodettoBufferOut",
+		"commodetto/PixelsOut": "$(MODDABLE)/modules/commodetto/commodettoPixelsOut"
+  },
+  "preload": [
+    "base64",
+    "digest",
+    "logical",
+    "http"
+  ],
+  "resources": {
+    "*-alpha": [
+      "$(MODDABLE)/examples/assets/fonts/OpenSans-Regular-20",
+      "$(MODDABLE)/examples/commodetto/docs/palatino_36",
+      "$(MODDABLE)/examples/commodetto/docs/OpenSans-SemiboldItalic-18"
+    ],
+		"*": [
+			"$(MODULES)/crypt/data/ca106",
+      "$(MODULES)/crypt/data/ca107",
+			"$(MODULES)/crypt/data/ca102",
+      "$(MODULES)/crypt/data/ca55"
+		]
+  },
+  "config": {
+    "sntp": "pool.ntp.org",
+    "buttonLabels": [
+      "C$",
+      "A",
+      "J"
+    ],
+    "endOfDayGMT": 15,
+    "mdnsDomainName": "meetings"
+  }
+}
