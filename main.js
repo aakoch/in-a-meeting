@@ -93,6 +93,8 @@ function getMeetingStatus() {
 
   let previousValue = false;
   let startTime = new Date();
+  let timeUpdater;
+  let statusUpdater;
 
   request.callback = function (message, value, etc) {
     if (Request.header === message)
@@ -113,7 +115,8 @@ function getMeetingStatus() {
         poco.end();
 
         if (previousValue) {
-          startTime = new Date()
+          startTime = new Date();
+          Timer.clear(timeUpdater);
         }
       } else {
         trace('in a meeting\n');
@@ -128,7 +131,13 @@ function getMeetingStatus() {
         //poco.drawText("since " + startTime.toLocaleTimeString(), palatino36, black, 4, 40);
         // trace("it's been " + (new Date() - startTime) + " ms");
 
-        Timer.repeat(id => {
+
+        if (!previousValue) {
+          startTime = new Date();
+          Timer.clear(timeUpdater);
+        }
+        
+        timeUpdater = Timer.repeat(id => {
           poco.begin();
           poco.fillRectangle(red, 0, 0, poco.width, poco.height);
           poco.drawText("In a meeting", palatino36, black, 4, 20);
@@ -136,10 +145,6 @@ function getMeetingStatus() {
           poco.end();
         }, 1000);
 
-
-        if (!previousValue) {
-          startTime = new Date()
-        }
       }
     }
 
