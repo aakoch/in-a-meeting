@@ -18,7 +18,11 @@ import Poco from "commodetto/Poco";
 import parseBMF from "commodetto/parseBMF";
 import parseBMP from "commodetto/parseBMP";
 import Resource from "Resource";
+import WiFi from "wifi";
 // import Timer from "timer";
+import Net from "net";
+import config from "mc/config";
+
 
 let poco = new Poco(screen);
 poco.begin();
@@ -47,14 +51,35 @@ palatino36.bitmap = parseBMP(new Resource("palatino_36.bmp"));
 // poco.drawText("Hello.", palatino36, green, 4, 55);
 
 poco.drawText("Loading...", palatino36, black, 4, 20);
+poco.drawText("Trying to connect to " + config.ssid + "...", palatino36, black, 4, 40);
 
 poco.end();
 
+let monitor = new WiFi({ssid: config.ssid, password: config.password}, msg => {
+	switch (msg) {
+		case WiFi.connected:
+			break; // still waiting for IP address
+		case WiFi.gotIP:
+      trace(`IP address ${Net.get("IP")}\n`);
 
-trace('poco made\n');
+      poco.begin();
+      poco.drawText("Connected to wi-fi", palatino36, black, 4, 60);
+      poco.drawText("Requesting meeting status", palatino36, black, 4, 80);
+      
+      poco.end();
+
+      getMeetingStatus();
+			break;
+		case WiFi.disconnected:
+			break;  // connection lost
+	}
+});
+
+
 
 // Timer.repeat(id => {
 
+function getMeetingStatus() {
 let request = new Request({
   host: "raw.githubusercontent.com", 
   path: "/aakoch/in-a-meeting/master/status", 
@@ -108,6 +133,7 @@ request.callback = function(message, value, etc)
   }
 
 // request.close();
+}
 }
 
 
