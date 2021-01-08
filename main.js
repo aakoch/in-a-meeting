@@ -80,7 +80,7 @@ let monitor = new WiFi({
 let previousValue = false;
 
 function getMeetingStatus() {
-  trace('inside getMeetingStatus');
+  trace('inside getMeetingStatus\n');
   let request = new Request({
     host: "raw.githubusercontent.com",
     path: "/aakoch/in-a-meeting/master/status",
@@ -100,7 +100,7 @@ function getMeetingStatus() {
       trace(`${value}: ${etc}\n`);
     else if (Request.responseComplete === message) {
       if (value.trim() == 'false') {
-        trace('not in a meeting')
+        trace('not in a meeting\n')
         inAMeeting = false;
 
         poco.begin();
