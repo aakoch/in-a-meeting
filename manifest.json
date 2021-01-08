@@ -33,9 +33,7 @@
   ],
   "resources": {
     "*-alpha": [
-      "$(MODDABLE)/examples/assets/fonts/OpenSans-Regular-20",
-      "$(MODDABLE)/examples/commodetto/docs/palatino_36",
-      "$(MODDABLE)/examples/commodetto/docs/OpenSans-SemiboldItalic-18"
+      "$(MODDABLE)/examples/assets/fonts/OpenSans-Regular-16"
     ],
 		"*": [
 			"$(MODULES)/crypt/data/ca106",
@@ -46,12 +44,6 @@
   },
   "config": {
     "sntp": "pool.ntp.org",
-    "buttonLabels": [
-      "C$",
-      "A",
-      "J"
-    ],
-    "endOfDayGMT": 15,
-    "mdnsDomainName": "meetings"
+		"rotation": 90
   }
 }
