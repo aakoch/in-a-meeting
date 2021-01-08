@@ -34,8 +34,6 @@ let red = poco.makeColor(255, 0, 0);
 let green = poco.makeColor(0, 255, 0);
 let blue = poco.makeColor(0, 0, 255);
 
-trace('enter\n');
-
 poco.fillRectangle(gray, 0, 0, poco.width, poco.height);
 // poco.fillRectangle(red, 5, 5, 10, 10);
 
@@ -55,6 +53,9 @@ poco.drawText("Trying to connect to " + config.ssid + "...", palatino36, black, 
 
 poco.end();
 
+let startTime = new Date();
+let inAMeeting = false
+
 let monitor = new WiFi({
   ssid: config.ssid,
   password: config.password
@@ -67,7 +68,7 @@ let monitor = new WiFi({
 
       Timer.repeat(id => {
         getMeetingStatus();
-      }, 29000);
+      }, 120000);
       break;
     case WiFi.disconnected:
       break; // connection lost
@@ -75,6 +76,8 @@ let monitor = new WiFi({
 });
 
 // Timer.repeat(id => {
+
+let previousValue = false;
 
 function getMeetingStatus() {
   trace('inside getMeetingStatus');
@@ -91,35 +94,24 @@ function getMeetingStatus() {
 
   trace('request made\n');
 
-  let previousValue = false;
-  let startTime = new Date();
-  let timeUpdater;
-  let statusUpdater;
 
   request.callback = function (message, value, etc) {
     if (Request.header === message)
       trace(`${value}: ${etc}\n`);
     else if (Request.responseComplete === message) {
-      trace("->" + value + "<-\n");
-
-      for (let i = 0; i < value.length; i++) {
-
-        trace(value.charAt(i) + "\n");
-      }
       if (value.trim() == 'false') {
         trace('not in a meeting')
+        inAMeeting = false;
+
         poco.begin();
         poco.fillRectangle(green, 0, 0, poco.width, poco.height);
 
         poco.drawText("Not in a meeting", palatino36, black, 4, 20);
         poco.end();
 
-        if (previousValue) {
-          startTime = new Date();
-          Timer.clear(timeUpdater);
-        }
       } else {
         trace('in a meeting\n');
+        inAMeeting = true;
 
         poco.begin();
 
@@ -128,30 +120,31 @@ function getMeetingStatus() {
         poco.drawText("In a meeting", palatino36, black, 4, 20);
         poco.end();
 
-        //poco.drawText("since " + startTime.toLocaleTimeString(), palatino36, black, 4, 40);
-        // trace("it's been " + (new Date() - startTime) + " ms");
-
-
-        if (!previousValue) {
-          startTime = new Date();
-          Timer.clear(timeUpdater);
-        }
-        
-        timeUpdater = Timer.repeat(id => {
-          poco.begin();
-          poco.fillRectangle(red, 0, 0, poco.width, poco.height);
-          poco.drawText("In a meeting", palatino36, black, 4, 20);
-          poco.drawText("for " + formatDisplayTime(startTime), palatino36, black, 4, 40);
-          poco.end();
-        }, 1000);
-
       }
+
+
+      if (previousValue != inAMeeting) {
+        startTime = new Date();
+        previousValue = inAMeeting;
+      }
+
     }
 
     // request.close();
   }
 }
 
+
+        
+Timer.repeat(id => {
+  if (inAMeeting) {
+    poco.begin();
+    poco.fillRectangle(red, 0, 0, poco.width, poco.height);
+    poco.drawText("In a meeting", palatino36, black, 4, 20);
+    poco.drawText("for " + formatDisplayTime(startTime), palatino36, black, 4, 40);
+    poco.end();
+  }
+}, 1000);
 
 // }, 10000);
 
@@ -204,6 +197,3 @@ function formatDisplayTime(startTime) {
   }
 
 }
-
-
-trace('end\n');
